@@ -32,4 +32,16 @@ export class CommentsController {
   ) {
     return this.commentsService.edit(Number(id), req.user.userId, body.content);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/delete')
+  async softDelete(@Param('id') id: string, @Request() req: any) {
+    return this.commentsService.delete(Number(id), req.user.userId);
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/restore')
+  async restore(@Param('id') id: string, @Request() req: any) {
+    return this.commentsService.restore(Number(id), req.user.userId);
+  }
 }

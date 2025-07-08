@@ -39,4 +39,7 @@ export class Comment {
 
   @Column({ default: false })
   isDeleted: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deletedAt: Date | null;
 }

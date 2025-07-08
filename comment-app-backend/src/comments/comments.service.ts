@@ -82,4 +82,42 @@ export class CommentsService {
     comment.content = newContent;
     return this.commentRepo.save(comment);
   }
+
+  async delete(commentId: number, authorId: number) {
+    const comment = await this.commentRepo.findOne({
+      where: { id: commentId },
+    });
+
+    if (!comment) throw new NotFoundException('Comment not found');
+    if (comment.authorId !== authorId)
+      throw new ForbiddenException('Not your comment');
+
+    comment.isDeleted = true;
+    comment.deletedAt = new Date();
+    return this.commentRepo.save(comment);
+  }
+
+  async restore(commentId: number, authorId: number) {
+    const comment = await this.commentRepo.findOne({
+      where: { id: commentId },
+    });
+
+    if (!comment) throw new NotFoundException('Comment not found');
+    if (comment.authorId !== authorId)
+      throw new ForbiddenException('Not your comment');
+
+    if (!comment.isDeleted || !comment.deletedAt)
+      throw new ForbiddenException('Comment is not deleted');
+    const minutesSinceDelete = differenceInMinutes(
+      new Date(),
+      comment.deletedAt,
+    );
+    if (minutesSinceDelete > 15) {
+      throw new ForbiddenException('Restore window expired');
+    }
+
+    comment.isDeleted = false;
+    comment.deletedAt = null; 
+    return this.commentRepo.save(comment);
+  }
 }
