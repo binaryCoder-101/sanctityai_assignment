@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity/user.entity';
 import { Comment } from './comments/comment.entity/comment.entity';
 import { CommentsModule } from './comments/comments.module';
+import { Notification } from './notifications/notification.entity/notification.entity'; // ✅
 import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
@@ -16,7 +17,7 @@ import { NotificationsModule } from './notifications/notifications.module';
       username: 'postgres',
       password: 'postgres',
       database: 'comment_app',
-      entities: [User, Comment],
+      entities: [User, Comment, Notification], 
       synchronize: true,
     }),
     AuthModule,

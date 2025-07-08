@@ -7,35 +7,43 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './comment.entity/comment.entity';
 import { differenceInMinutes } from 'date-fns';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private commentRepo: Repository<Comment>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(
-    content: string,
-    authorId: number,
-    parentId?: number,
-  ): Promise<Comment> {
-    const comment = this.commentRepo.create({
-      content,
-      authorId,
-      parentId,
+  content: string,
+  authorId: number,
+  parentId?: number,
+): Promise<Comment> {
+  const comment = this.commentRepo.create({
+    content,
+    authorId,
+    parentId,
+  });
+
+  const savedComment = await this.commentRepo.save(comment); // ✅ save first
+
+  if (parentId) {
+    const parent = await this.commentRepo.findOne({
+      where: { id: parentId },
     });
+    if (!parent) throw new NotFoundException('Parent comment not found');
 
-    // Optional: check if parent exists before nesting
-    if (parentId) {
-      const parent = await this.commentRepo.findOne({
-        where: { id: parentId },
-      });
-      if (!parent) throw new NotFoundException('Parent comment not found');
+    if (parent.authorId !== authorId) {
+      await this.notificationsService.create(parent.authorId, savedComment.id); // ✅ use saved ID
     }
-
-    return this.commentRepo.save(comment);
   }
+
+  return savedComment;
+}
+
 
   async getThread(commentId: number): Promise<any> {
     const root = await this.commentRepo.findOne({
@@ -117,7 +125,7 @@ export class CommentsService {
     }
 
     comment.isDeleted = false;
-    comment.deletedAt = null; 
+    comment.deletedAt = null;
     return this.commentRepo.save(comment);
   }
 }
