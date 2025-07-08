@@ -22,11 +22,11 @@ This is a scalable, backend-heavy full stack comment application built as part o
 ### 💬 Comments
 - Post top-level comments and nested replies (infinite depth)
 - Fetch full comment threads publicly
-- Edit your own comments anytime (currently without time limit)
+- Edit your own comments anytime within a grace period of 15 minutes
 
-### 🗑️ Soft Delete & Restore (Upcoming)
+### 🗑️ Soft Delete & Restore 
 - Delete comments (preserved as `[deleted]`)
-- Restore within a grace period (coming soon)
+- Restore within a grace period of 15 minutes
 
 ### 🔔 Notifications (Planned)
 - Notify users when someone replies to their comment
@@ -66,7 +66,7 @@ comment-app/
 
 ---
 
-## 🐳 Docker Setup (Planned)
+## 🐳 Docker Setup 
 
 Docker support for both backend and PostgreSQL coming soon.
 
